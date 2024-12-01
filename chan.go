@@ -14,7 +14,7 @@ type barrier struct {
 
 // newBarrier creates a barrier that coordinates 'count' number of goroutines.
 // It launches a background goroutine to manage the synchronization lifecycle.
-func newBarrier(count int) *barrier {
+func newBarrier(count uint32) *barrier {
 	result := &barrier{inCh: make(chan bool), outCh: make(chan bool)}
 	go result.loop(count)
 	return result
@@ -30,14 +30,14 @@ func (b *barrier) Await() {
 // loop manages the barrier's lifecycle by collecting signals from arriving goroutines
 // and releasing them once all have arrived. This process repeats indefinitely,
 // allowing the barrier to be reused.
-func (b *barrier) loop(count int) {
+func (b *barrier) loop(count uint32) {
 	for {
 		// Wait for all goroutines to arrive.
-		for i := 0; i < count; i++ {
+		for range count {
 			<-b.inCh
 		}
 		// Release all waiting goroutines simultaneously.
-		for i := 0; i < count; i++ {
+		for range count {
 			b.outCh <- true
 		}
 	}

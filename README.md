@@ -19,5 +19,36 @@ This repository serves as a learning sandbox to experiment with implementing bar
 The repository includes:
 - **Basic barrier implementation** using `sync.Cond`.
 - **Channel-based barrier** for lightweight synchronization.
-- **Custom reusable barrier** designed for multiple phases of synchronization.
 - More to come as experimentation progresses!
+
+## Benchmarks
+
+The following benchmarks compare different barrier implementations on an Apple M1 Pro (arm64):
+
+```text
+goos: darwin
+goarch: arm64
+pkg: github.com/ahrav/go-barrier
+cpu: Apple M1 Pro
+=== RUN   BenchmarkBarrierComparison
+BenchmarkBarrierComparison
+=== RUN   BenchmarkBarrierComparison/Sync-Small-2
+BenchmarkBarrierComparison/Sync-Small-2
+BenchmarkBarrierComparison/Sync-Small-2-8                1433503               790.7 ns/op            64 B/op          3 allocs/op
+=== RUN   BenchmarkBarrierComparison/Chan-Small-2
+BenchmarkBarrierComparison/Chan-Small-2
+BenchmarkBarrierComparison/Chan-Small-2-8                 961046              1235 ns/op              64 B/op          3 allocs/op
+=== RUN   BenchmarkBarrierComparison/Sync-Medium-10
+BenchmarkBarrierComparison/Sync-Medium-10
+BenchmarkBarrierComparison/Sync-Medium-10-8               260760              4546 ns/op             256 B/op         11 allocs/op
+=== RUN   BenchmarkBarrierComparison/Chan-Medium-10
+BenchmarkBarrierComparison/Chan-Medium-10
+BenchmarkBarrierComparison/Chan-Medium-10-8               184558              6580 ns/op             256 B/op         11 allocs/op
+=== RUN   BenchmarkBarrierComparison/Sync-Large-100
+BenchmarkBarrierComparison/Sync-Large-100
+BenchmarkBarrierComparison/Sync-Large-100-8                21662             63892 ns/op            2429 B/op        101 allocs/op
+=== RUN   BenchmarkBarrierComparison/Chan-Large-100
+BenchmarkBarrierComparison/Chan-Large-100
+BenchmarkBarrierComparison/Chan-Large-100-8                19168             58819 ns/op            2428 B/op        101 allocs/op
+```
+
