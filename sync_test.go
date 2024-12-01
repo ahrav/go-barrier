@@ -151,7 +151,7 @@ func BenchmarkBarrierComparison(b *testing.B) {
 				for j := 0; j < tc.numGoroutines; j++ {
 					go func() {
 						defer wg.Done()
-						barrier.Await()
+						barrier.Wait()
 					}()
 				}
 

@@ -2,17 +2,26 @@ package barrier
 
 import "sync"
 
-type Barrier struct {
-	cond    *sync.Cond
-	total   uint32
-	current uint32
+// syncBarrier implements a reusable synchronization point using sync.Cond.
+// This implementation is more efficient than channels for larger numbers of
+// goroutines as it avoids the overhead of message passing.
+type syncBarrier struct {
+	cond    *sync.Cond  // Coordinates goroutine synchronization
+	total   uint32      // Total number of goroutines to synchronize
+	current uint32      // Number of goroutines currently waiting
 }
 
-func NewBarrier(n uint32) *Barrier {
-	return &Barrier{total: n, cond: sync.NewCond(new(sync.Mutex))}
+// NewBarrier creates a barrier that coordinates n goroutines.
+// The barrier can be reused for multiple synchronization rounds.
+func NewBarrier(n uint32) *syncBarrier {
+	return &syncBarrier{total: n, cond: sync.NewCond(new(sync.Mutex))}
 }
 
-func (b *Barrier) Wait() {
+// Wait blocks until all goroutines have called Wait. The last goroutine
+// to arrive releases all waiting goroutines and resets the barrier.
+// This method is safe for concurrent access and can be called repeatedly
+// for multiple synchronization rounds.
+func (b *syncBarrier) Wait() {
 	b.cond.L.Lock()
 	defer b.cond.L.Unlock()
 

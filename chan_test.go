@@ -18,7 +18,7 @@ func TestBarrier_Basic(t *testing.T) {
 		go func(id int) {
 			defer wg.Done()
 			time.Sleep(time.Duration(id*100) * time.Millisecond) // Simulate different work times
-			b.Await()
+			b.Wait()
 			if elapsed := time.Since(startTime); elapsed < time.Duration(200)*time.Millisecond {
 				t.Errorf("Goroutine %d finished too early: %v", id, elapsed)
 			}
@@ -43,7 +43,7 @@ func TestBarrier_MultipleRounds(t *testing.T) {
 			go func(id, round int) {
 				defer wg.Done()
 				time.Sleep(time.Duration(id*50) * time.Millisecond)
-				b.Await()
+				b.Wait()
 				elapsed := time.Since(roundStart)
 				if elapsed < time.Duration(150)*time.Millisecond {
 					t.Errorf("Round %d, Goroutine %d finished too early: %v", round, id, elapsed)
@@ -70,7 +70,7 @@ func TestBarrier_Stress(t *testing.T) {
 		for i := 0; i < numGoroutines; i++ {
 			go func() {
 				defer wg.Done()
-				b.Await()
+				b.Wait()
 			}()
 		}
 		wg.Wait()
@@ -100,7 +100,7 @@ func BenchmarkBarrier(b *testing.B) {
 				for j := 0; j < bm.numGoroutines; j++ {
 					go func() {
 						defer wg.Done()
-						barrier.Await()
+						barrier.Wait()
 					}()
 				}
 

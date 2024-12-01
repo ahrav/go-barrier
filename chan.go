@@ -5,24 +5,24 @@ package barrier
 // This is particularly useful in scenarios where you need to ensure that a group of
 // goroutines have all reached a certain point before any of them can continue.
 
-// barrier coordinates the synchronization using two channels - one for goroutines
+// chanBarrier coordinates the synchronization using two channels - one for goroutines
 // to signal their arrival and another to release them once all have arrived.
-type barrier struct {
+type chanBarrier struct {
 	inCh  chan bool // Channel for goroutines to signal their arrival.
 	outCh chan bool // Channel to release waiting goroutines.
 }
 
 // newBarrier creates a barrier that coordinates 'count' number of goroutines.
 // It launches a background goroutine to manage the synchronization lifecycle.
-func newBarrier(count uint32) *barrier {
-	result := &barrier{inCh: make(chan bool), outCh: make(chan bool)}
+func newBarrier(count uint32) *chanBarrier {
+	result := &chanBarrier{inCh: make(chan bool), outCh: make(chan bool)}
 	go result.loop(count)
 	return result
 }
 
-// Await blocks the calling goroutine until all other goroutines (as specified by count)
-// have also called Await. This creates a synchronization point in the program.
-func (b *barrier) Await() {
+// Wait blocks the calling goroutine until all other goroutines (as specified by count)
+// have also called Wait. This creates a synchronization point in the program.
+func (b *chanBarrier) Wait() {
 	b.inCh <- true
 	<-b.outCh
 }
@@ -30,7 +30,7 @@ func (b *barrier) Await() {
 // loop manages the barrier's lifecycle by collecting signals from arriving goroutines
 // and releasing them once all have arrived. This process repeats indefinitely,
 // allowing the barrier to be reused.
-func (b *barrier) loop(count uint32) {
+func (b *chanBarrier) loop(count uint32) {
 	for {
 		// Wait for all goroutines to arrive.
 		for range count {
